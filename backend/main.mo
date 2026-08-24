@@ -1,4 +1,5 @@
 import LLM "canister:llm";
+import Array "mo:core/Array";
 
 // The backend calls the LLM canister's `v1_chat` endpoint through the typed
 // `canister:llm` import — no LLM actor type is declared here. The import is
@@ -66,5 +67,44 @@ actor {
       case (?text) text;
       case null ""
     }
+  };
+
+  // Trade decision/execution log written by the Pionex US trading uAgent
+  // (see agent/icp_logger.py). Every risk-layer decision and order outcome
+  // is appended here, approved or not, so the log is a complete audit trail
+  // rather than a record of only successful trades.
+  public type TradeDecision = {
+    #approved;
+    #rejected;
+    #executed;
+    #failed
+  };
+
+  public type TradeRecord = {
+    timestampMs : Int;
+    symbol : Text;
+    side : Text;
+    decision : TradeDecision;
+    reason : Text;
+    notionalUsd : Float;
+    orderId : ?Text
+  };
+
+  // `--default-persistent-actors` (see mops.toml) makes this var persist
+  // across upgrades without an explicit `stable` keyword.
+  var tradeLog : [TradeRecord] = [];
+
+  public func logTrade(record : TradeRecord) : async () {
+    let n = tradeLog.size();
+    tradeLog := Array.tabulate<TradeRecord>(
+      n + 1,
+      func(i : Nat) : TradeRecord {
+        if (i < n) { tradeLog[i] } else { record }
+      }
+    )
+  };
+
+  public query func getTradeLogs() : async [TradeRecord] {
+    tradeLog
   }
 }

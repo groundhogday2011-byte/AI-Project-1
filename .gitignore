@@ -14,5 +14,11 @@ target/
 # environment variables
 .env
 
+# trading agent local fallback log / python artifacts
+agent/data/
+__pycache__/
+*.pyc
+.pytest_cache/
+
 # examples folder is symlinked to submodule
 examples/

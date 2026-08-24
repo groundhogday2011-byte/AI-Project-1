@@ -28,7 +28,26 @@ type AssistantMessage =
    content: opt text;
    tool_calls: vec ToolCall;
  };
+type TradeDecision =
+ variant {
+   approved;
+   executed;
+   failed;
+   rejected;
+ };
+type TradeRecord =
+ record {
+   decision: TradeDecision;
+   notionalUsd: float64;
+   orderId: opt text;
+   reason: text;
+   side: text;
+   symbol: text;
+   timestampMs: int;
+ };
 service : {
   chat: (messages: vec ChatMessage) -> (text);
+  getTradeLogs: () -> (vec TradeRecord) query;
+  logTrade: (record: TradeRecord) -> ();
   prompt: (prompt: text) -> (text);
 }

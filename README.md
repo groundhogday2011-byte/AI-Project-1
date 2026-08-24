@@ -95,6 +95,50 @@ ic-wasm llm-canister.wasm metadata candid:service > candid/llm.did
 
 Both give the same interface as long as `icp.yaml` pins the release that is live on mainnet.
 
+## Fetch.ai Webot trading uAgent
+
+`agent/` holds a fetch.ai uAgent that trades on Pionex US, alongside the ICP
+backend. Layout:
+
+- `agent/config.py` — all configuration from environment variables (see
+  `.env.example`); no secret has a default.
+- `agent/rate_limiter.py` — token-bucket limiter for Pionex US's shared,
+  IP-wide 10 req/sec cap.
+- `agent/pionex_client.py` — Pionex US Open API client. Only the `market`
+  (public data) and `trade` namespaces are reachable; `fiat` and `asset`
+  (deposit/withdrawal/wallet balance) are structurally excluded — there is
+  no method for them, and the path builder refuses to construct a request
+  outside the allowlist even if called directly.
+- `agent/market_data.py` — market snapshots (price, spread, volume,
+  volatility) from ASI:One, falling back to Pionex US public market data
+  while the ASI:One uAgent handshake is being finalized.
+- `agent/risk.py` — the risk tolerance layer (position size cap, daily loss
+  cap, volatility ceiling, spread/slippage cap). Every proposed order must
+  clear `RiskEngine.evaluate` before it can reach the Pionex client.
+- `agent/icp_logger.py` — logs every trade decision (approved, rejected,
+  executed, failed) to the ICP `logTrade` canister method (see
+  `backend/main.mo`), falling back to a local JSONL file until the canister
+  is configured.
+- `agent/trading_agent.py` — wires the above into a uAgent polling loop.
+  Order placement only runs when `LIVE_TRADING_ENABLED=true`; it defaults to
+  false so the agent runs in dry-run mode until real Pionex US trade-only
+  keys (no withdrawal scope) are provisioned.
+
+### Setup
+
+```bash
+pip install -r requirements.txt
+cp .env.example .env   # fill in real values as they become available
+python -m agent.trading_agent
+```
+
+### Tests
+
+```bash
+pip install -r requirements.txt
+pytest
+```
+
 ## Security considerations and best practices
 
 If you base your application on this example, familiarize yourself with the [security best practices](https://docs.internetcomputer.org/guides/security/overview) for developing on ICP. This example may not implement all best practices.

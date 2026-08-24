@@ -1,0 +1,10 @@
+uagents>=0.22.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# Optional: only needed once ICP_TRADE_LOG_CANISTER_ID is configured to log
+# trades directly to the canister (see agent/icp_logger.py).
+# ic-py>=1.0.1
+
+# Dev/test
+pytest>=8.0.0
