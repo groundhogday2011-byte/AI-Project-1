@@ -1,6 +1,6 @@
 # BMS 66 *Plumbing Manual* (1940), printed page 8: Definitions (part)
 
-Source: text pasted by the owner from the NIST scan (OCR). Obvious OCR errors were corrected, and the wording is otherwise unchanged. The owner should confirm that this page is from BMS 66. It refers to "this manual" and "par. 101, pt. III".
+Source: text pasted by the owner from the NIST scan (OCR). Obvious OCR errors were corrected, and the wording is otherwise unchanged. The owner confirmed this page is from BMS 66.
 The page starts partway through the definitions and ends mid-sentence ("Subsoil drain").
 
 **Nonpressure drainage.** Nonpressure drainage refers to a condition in which a static pressure cannot be imposed safely on the building drain. This condition is sometimes referred to as gravity flow and implies that the sloping pipes are not completely filled.
